@@ -1,0 +1,7 @@
+/target/
+/ext_lib/*.so*
+/haskell_duckling_ffi/dist-newstyle/
+/deploy_bundle/
+ext_lib
+haskell_duckling_ffi/a.out
+.idea

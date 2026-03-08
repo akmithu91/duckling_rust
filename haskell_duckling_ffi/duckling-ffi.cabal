@@ -1,0 +1,29 @@
+cabal-version: 3.0
+name: duckling-ffi
+version: 1.0.0
+build-type: Simple
+
+foreign-library ducklingffi
+  type: native-shared
+  
+  if os(Windows)
+    options: standalone
+    
+  other-modules: DucklingFFI
+  
+  build-depends: 
+      base >= 4.12 && < 5
+    , duckling
+    , text
+    , bytestring
+    , aeson
+    , time
+    , unordered-containers
+    , tz
+    
+  hs-source-dirs: src
+  c-sources: csrc/wrapper.c
+  
+  ghc-options: -dynamic -shared -fPIC -flink-rts
+  
+  default-language: Haskell2010
