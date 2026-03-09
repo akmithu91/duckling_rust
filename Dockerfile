@@ -35,9 +35,9 @@ WORKDIR /app
 
 COPY . .
 
-
 RUN --mount=type=secret,id=token \
     mkdir -p .cargo && make clean && \
-    printf '[registries.my_registry]\nindex = "sparse+%s"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
+    printf '[registries.my_registry]\nindex = "sparse+%s"\ncredential-provider = "cargo:token"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
       "${CODEARTIFACT_URL}" > .cargo/config.toml && \
-    CARGO_REGISTRIES_MY_REGISTRY_TOKEN="$(cat /run/secrets/token)" cargo publish --registry my_registry
+    CARGO_REGISTRIES_MY_REGISTRY_TOKEN="$(cat /run/secrets/token)" \
+    cargo publish --registry my_registry
