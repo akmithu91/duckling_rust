@@ -37,6 +37,6 @@ ARG CODEARTIFACT_URL
 ARG CODEARTIFACT_TOKEN
 
 RUN mkdir -p .cargo && make clean && \
-    printf '[registry]\nglobal-credential-providers = ["cargo:token"]\n\n[registries.codeartifact]\nindex = "sparse+%s"\ntoken = "Bearer %s"\n' \
+    printf '[registries.my_registry]\nindex = "sparse+%s"\ntoken = "%s"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
       "${CODEARTIFACT_URL}" "${CODEARTIFACT_TOKEN}" > .cargo/config.toml && \
-    cargo publish --registry codeartifact --allow-dirty
+    cargo publish --registry my_registry
