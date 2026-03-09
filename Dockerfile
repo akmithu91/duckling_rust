@@ -36,8 +36,8 @@ COPY . .
 ARG CODEARTIFACT_URL
 
 RUN --mount=type=secret,id=token \
-    CODEARTIFACT_TOKEN=$(cat /run/secrets/token) && \
+    export CARGO_REGISTRIES_CODEARTIFACT_TOKEN="Bearer $(cat /run/secrets/token)" && \
     mkdir -p .cargo && make clean && \
-    printf '[registry]\nglobal-credential-providers = ["cargo:token"]\n\n[registries.codeartifact]\nindex = "sparse+%s"\ntoken = "Bearer %s"\n' \
-      "${CODEARTIFACT_URL}" "${CODEARTIFACT_TOKEN}" > .cargo/config.toml && \
+    printf '[registries.codeartifact]\nindex = "sparse+%s"\n' \
+      "${CODEARTIFACT_URL}" > .cargo/config.toml && \
     cargo publish --registry codeartifact

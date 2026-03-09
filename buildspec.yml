@@ -11,13 +11,14 @@ phases:
   build:
     commands:
       - echo "Building Docker image..."
-      - docker buildx build
-          --cache-from type=local,src=/tmp/docker-cache
-          --cache-to type=local,dest=/tmp/docker-cache,mode=max
-          --build-arg CODEARTIFACT_URL="${CODEARTIFACT_URL}"
-          --secret id=token,src=/tmp/codeartifact_token
-          -t duckling-rust
-          --load
+      - |
+        docker buildx build \
+          --cache-from type=local,src=/tmp/docker-cache \
+          --cache-to type=local,dest=/tmp/docker-cache,mode=max \
+          --build-arg CODEARTIFACT_URL="${CODEARTIFACT_URL}" \
+          --secret id=token,src=/tmp/codeartifact_token \
+          -t duckling-rust \
+          --load \
           .
   post_build:
     commands:
