@@ -2,6 +2,8 @@
 name = "duckling_rust"
 version = "0.1.4"
 edition = "2021"
+description = "Rust FFI for Duckling"
+license = "MIT"
 links = "ducklingffi"
 include = ["src/**/*", "Cargo.toml", "build.rs", "ext_lib/**/*"]
 
