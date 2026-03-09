@@ -22,9 +22,12 @@ fn main() {
         run_cmd("ghcup", &["install", "ghc", "9.2.8"], None);
         run_cmd("ghcup", &["set", "ghc", "9.2.8"], None);
 
-        // Ensure ghcup bin dir is on PATH so cabal/ghc are found
-        if let Some(home) = env::var_os("HOME") {
-            let ghcup_bin = Path::new(&home).join(".ghcup/bin");
+        // Ensure ghcup bin dir is on PATH so cabal/ghc are found.
+        // GHCUP_INSTALL_BASE_PREFIX overrides the default $HOME location.
+        let ghcup_base = env::var_os("GHCUP_INSTALL_BASE_PREFIX")
+            .or_else(|| env::var_os("HOME"));
+        if let Some(base) = ghcup_base {
+            let ghcup_bin = Path::new(&base).join(".ghcup/bin");
             if ghcup_bin.exists() {
                 let current_path = env::var("PATH").unwrap_or_default();
                 env::set_var("PATH", format!("{}:{}", ghcup_bin.display(), current_path));
@@ -35,7 +38,7 @@ fn main() {
         run_cmd("cabal", &["clean"], Some(&haskell_dir));
         run_cmd(
             "cabal",
-            &["build", "--allow-newer", "-j8", "--ghc-options=-O0"],
+            &["build", "--allow-newer", "-j", "--ghc-options=-O0 +RTS -N -RTS"],
             Some(&haskell_dir),
         );
 
