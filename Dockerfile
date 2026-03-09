@@ -17,6 +17,8 @@ RUN apt-get update && apt-get install -y \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+ARG CODEARTIFACT_URL
+
 # Install ghcup, GHC 9.2.8, and cabal
 ENV GHCUP_INSTALL_BASE_PREFIX=/opt
 ENV PATH="/opt/.ghcup/bin:${PATH}"
@@ -33,10 +35,9 @@ WORKDIR /app
 
 COPY . .
 
-ARG CODEARTIFACT_URL
-ARG CODEARTIFACT_TOKEN
 
-RUN mkdir -p .cargo && make clean && \
-    printf '[registries.my_registry]\nindex = "sparse+%s"\ntoken = "%s"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
-      "${CODEARTIFACT_URL}" "${CODEARTIFACT_TOKEN}" > .cargo/config.toml && \
-    cargo publish --registry my_registry
+RUN --mount=type=secret,id=token \
+    mkdir -p .cargo && make clean && \
+    printf '[registries.my_registry]\nindex = "sparse+%s"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
+      "${CODEARTIFACT_URL}" > .cargo/config.toml && \
+    CARGO_REGISTRIES_MY_REGISTRY_TOKEN="$(cat /run/secrets/token)" cargo publish --registry my_registry
