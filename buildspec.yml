@@ -3,26 +3,24 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - echo "Authenticating with CodeArtifact..."
-      - export CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --query authorizationToken --output text)
-      - export CODEARTIFACT_URL=$(aws codeartifact get-repository-endpoint --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository cargo-repo --format cargo --query repositoryEndpoint --output text)
-      - echo -n "$CODEARTIFACT_TOKEN" > /tmp/codeartifact_token
       - docker buildx create --use --driver docker-container
   build:
     commands:
-      - echo "Building Docker image..."
       - |
+        echo "Authenticating with CodeArtifact..." && \
+        CODEARTIFACT_TOKEN=$(aws codeartifact get-authorization-token --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --query authorizationToken --output text) && \
+        CODEARTIFACT_URL=$(aws codeartifact get-repository-endpoint --domain $CODEARTIFACT_DOMAIN --domain-owner $CODEARTIFACT_DOMAIN_OWNER --repository cargo-repo --format cargo --query repositoryEndpoint --output text) && \
+        echo "Token length: ${#CODEARTIFACT_TOKEN}" && \
         docker buildx build \
           --cache-from type=local,src=/tmp/docker-cache \
           --cache-to type=local,dest=/tmp/docker-cache,mode=max \
           --build-arg CODEARTIFACT_URL="${CODEARTIFACT_URL}" \
-          --secret id=token,src=/tmp/codeartifact_token \
+          --build-arg CODEARTIFACT_TOKEN="${CODEARTIFACT_TOKEN}" \
           -t duckling-rust \
           --load \
           .
   post_build:
     commands:
-      - rm -f /tmp/codeartifact_token
       - echo "Package published to CodeArtifact cargo-repo"
 
 cache:
