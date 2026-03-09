@@ -22,6 +22,15 @@ fn main() {
         run_cmd("ghcup", &["install", "ghc", "9.2.8"], None);
         run_cmd("ghcup", &["set", "ghc", "9.2.8"], None);
 
+        // Ensure ghcup bin dir is on PATH so cabal/ghc are found
+        if let Some(home) = env::var_os("HOME") {
+            let ghcup_bin = Path::new(&home).join(".ghcup/bin");
+            if ghcup_bin.exists() {
+                let current_path = env::var("PATH").unwrap_or_default();
+                env::set_var("PATH", format!("{}:{}", ghcup_bin.display(), current_path));
+            }
+        }
+
         // Clean and build
         run_cmd("cabal", &["clean"], Some(&haskell_dir));
         run_cmd(

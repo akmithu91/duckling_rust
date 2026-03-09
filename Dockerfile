@@ -29,8 +29,6 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
     BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 \
     sh
 
-RUN ghcup set ghc 9.2.8
-
 WORKDIR /app
 
 COPY . .
