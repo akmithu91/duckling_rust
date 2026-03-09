@@ -18,6 +18,15 @@ fn main() {
     if !target_so.exists() {
         println!("cargo:warning=libducklingffi.so not found — building from Haskell source...");
 
+        if !haskell_dir.exists() {
+            panic!(
+                "libducklingffi.so not found at {} and Haskell source directory {} does not exist. \
+                 Ensure ext_lib/libducklingffi.so is provided or include haskell_duckling_ffi/ in the package.",
+                target_so.display(),
+                haskell_dir.display()
+            );
+        }
+
         // Ensure GHC 9.2.8 is installed and active
         run_cmd("ghcup", &["install", "ghc", "9.2.8"], None);
         run_cmd("ghcup", &["set", "ghc", "9.2.8"], None);
