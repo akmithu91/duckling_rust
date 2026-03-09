@@ -37,7 +37,7 @@ COPY . .
 
 RUN --mount=type=secret,id=token \
     CODEARTIFACT_TOKEN=$(cat /run/secrets/token) && \
-    mkdir -p .cargo && make clean &&\
-    printf '[registries.codeartifact]\nindex = "%s"\ntoken = "Bearer %s"\n\n[source.crates-io]\nreplace-with = "codeartifact"\n\n[source.codeartifact]\nregistry = "%s"\n' \
-      "${CODEARTIFACT_URL}" "${CODEARTIFACT_TOKEN}" "${CODEARTIFACT_URL}" > .cargo/config.toml && \
+    mkdir -p .cargo && make clean && \
+    printf '[registries.codeartifact]\nindex = "sparse+%s"\ntoken = "Bearer %s"\n' \
+      "${CODEARTIFACT_URL}" "${CODEARTIFACT_TOKEN}" > .cargo/config.toml && \
     cargo publish --registry codeartifact
