@@ -29,6 +29,8 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
 
 RUN ghcup set ghc 9.2.8
 
+ARG CODEARTIFACT_URL
+
 WORKDIR /app
 
 COPY . .
