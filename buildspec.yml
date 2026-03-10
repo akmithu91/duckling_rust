@@ -11,8 +11,8 @@ phases:
     commands:
       - echo "Building Docker image..."
       - docker buildx build
-        --cache-from type=s3,region=us-west-2,bucket=cicd-codebuild-cache-572493397591,prefix=duckling_rust/
-        --cache-to type=s3,region=us-west-2,bucket=cicd-codebuild-cache-572493397591,prefix=duckling_rust/,mode=max
+        --cache-from type=s3,region=us-west-2,bucket=cicd-codebuild-cache-572493397591,prefix=duckling-rust/
+        --cache-to type=s3,region=us-west-2,bucket=cicd-codebuild-cache-572493397591,prefix=duckling-rust/,mode=max
         --build-arg CODEARTIFACT_URL="${CODEARTIFACT_URL}"
         --secret id=token,env=CODEARTIFACT_TOKEN
         -t duckling-rust
