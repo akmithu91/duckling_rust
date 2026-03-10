@@ -33,8 +33,12 @@ WORKDIR /app
 
 COPY . .
 
+# Build the Haskell .so and bundle deps into ext_lib/ first,
+# so cargo publish can include them in the crate tarball.
+RUN cargo build
+
 RUN --mount=type=secret,id=token \
-    mkdir -p .cargo && make clean && \
+    mkdir -p .cargo && cargo clean && \
     printf '[registries.my_registry]\nindex = "sparse+%s"\ncredential-provider = "cargo:token"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
       "${CODEARTIFACT_URL}" > .cargo/config.toml && \
     CARGO_REGISTRIES_MY_REGISTRY_TOKEN="$(cat /run/secrets/token)" \
