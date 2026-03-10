@@ -46,7 +46,7 @@ fn main() {
         // Build (skip cabal clean to allow incremental builds)
         run_cmd(
             "cabal",
-            &["build", "--allow-newer", "-j", "--ghc-options=-O0 +RTS -N -RTS"],
+            &["build", "--allow-newer", "-j", "--ghc-options=-O0 -j +RTS -N -RTS"],
             Some(&haskell_dir),
         );
 
