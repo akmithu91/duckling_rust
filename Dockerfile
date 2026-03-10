@@ -1,6 +1,6 @@
 FROM rust:1.94-slim-bullseye
 
-# System dependencies (ldd is included via libc-bin)
+# System dependencies
 RUN apt-get update && apt-get install -y \
     pkg-config \
     libssl-dev \
@@ -29,15 +29,14 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
     BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 \
     sh
 
-# Use all available CPUs for C compilation
-ENV MAKEFLAGS="-j$(nproc)"
-
 WORKDIR /app
 
 COPY . .
 
-# cargo publish triggers build.rs, which builds the Haskell .so into
-# ext_lib/ and bundles its runtime deps — no separate cargo build needed.
+# Step 1: Build Haskell .so and bundle deps into ext_lib/
+RUN make haskell
+
+# Step 2: Publish the crate (ext_lib/*.so is already in place)
 RUN --mount=type=secret,id=token \
     mkdir -p .cargo && \
     printf '[registries.my_registry]\nindex = "sparse+%s"\ncredential-provider = "cargo:token"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
