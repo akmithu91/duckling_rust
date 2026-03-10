@@ -29,16 +29,18 @@ RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
     BOOTSTRAP_HASKELL_INSTALL_NO_STACK=1 \
     sh
 
+# Use all available CPUs for Rust and C compilation
+ENV CARGO_BUILD_JOBS=0
+ENV MAKEFLAGS="-j$(nproc)"
+
 WORKDIR /app
 
 COPY . .
 
-# Build the Haskell .so and bundle deps into ext_lib/ first,
-# so cargo publish can include them in the crate tarball.
-RUN cargo build
-
+# cargo publish triggers build.rs, which builds the Haskell .so into
+# ext_lib/ and bundles its runtime deps — no separate cargo build needed.
 RUN --mount=type=secret,id=token \
-    mkdir -p .cargo && cargo clean && \
+    mkdir -p .cargo && \
     printf '[registries.my_registry]\nindex = "sparse+%s"\ncredential-provider = "cargo:token"\n\n[registry]\ndefault = "my_registry"\n\n[source.crates-io]\nreplace-with = "my_registry"\n' \
       "${CODEARTIFACT_URL}" > .cargo/config.toml && \
     CARGO_REGISTRIES_MY_REGISTRY_TOKEN="$(cat /run/secrets/token)" \
